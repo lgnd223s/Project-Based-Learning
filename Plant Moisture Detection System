@@ -1,0 +1,54 @@
+#include <LiquidCrystal.h>
+
+// Initialize the LCD with the interface pins
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+const int sensorPin = A0; // Analog pin connected to the sensor's AO pin
+const int dryValue = 1023; // Value when sensor is dry (in air)
+const int wetValue = 0;    // Value when sensor is fully submerged in water
+const int threshold = 30;  // Moisture percentage below which plant needs water
+
+void setup() {
+  // Set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  
+  // Print initial message
+  lcd.print("Soil Moisture:");
+  
+  // Initialize serial communication (optional, for debugging)
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = analogRead(sensorPin); // Read the sensor value
+  // Map the value to a percentage (inverting because higher values mean drier soil)
+  int moisturePercent = map(sensorValue, dryValue, wetValue, 0, 100);
+  
+  // Constrain the value to 0-100% in case sensor readings go beyond calibration
+  moisturePercent = constrain(moisturePercent, 0, 100);
+
+  // Clear the second row and print the moisture level
+  lcd.setCursor(0, 1); // Move cursor to the second row
+  lcd.print("Moisture: ");
+  lcd.print(moisturePercent);
+  lcd.print("% ");
+  
+  // Check if water is needed
+  if (moisturePercent < threshold) {
+    lcd.print("WATER!");
+  } else {
+    lcd.print("OK    "); // Extra spaces to clear previous message
+  }
+
+  // Optional: Print to serial monitor for debugging
+  Serial.print("Soil Moisture: ");
+  Serial.print(moisturePercent);
+  Serial.print("% - ");
+  if (moisturePercent < threshold) {
+    Serial.println("WATER NEEDED!");
+  } else {
+    Serial.println("Moisture OK");
+  }
+
+  delay(1000); // Update every second
+}
