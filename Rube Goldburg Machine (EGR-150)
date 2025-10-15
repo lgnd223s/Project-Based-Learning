@@ -1,0 +1,17 @@
+int beamPin = 2;      // IR break-beam receiver pin
+int solenoidPin = 9;  // MOSFET gate pin
+
+void setup() {
+  pinMode(beamPin, INPUT);
+  pinMode(solenoidPin, OUTPUT);
+  digitalWrite(solenoidPin, LOW); // solenoid off initially
+}
+
+void loop() {
+  if (digitalRead(beamPin) == LOW) {  // beam broken
+    delay(1000);                      // wait 1 second before activating
+    digitalWrite(solenoidPin, HIGH);  // turn solenoid on
+    delay(300);                       // stay on for 0.3 sec
+    digitalWrite(solenoidPin, LOW);   // turn solenoid off
+  }
+}
